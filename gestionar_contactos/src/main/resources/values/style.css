@@ -1,0 +1,36 @@
+.transparent{
+    -fx-background-color: rgba(0,0,0,0);
+}
+
+.shadow{
+    -fx-effect: dropShadow(three-pass-box,rgba(0,0,0,0.1), 10.0, 0.0, 0.0, 10.0);
+}
+.search-button{
+    -fx-background-color:#FFFFFF;
+    -fx-background-radius: 100;
+    -fx-cursor: hand;
+}
+
+.add-btn{
+    -fx-background-color: #FFFFFF;
+    -fx-background-radius: 100;
+    -fx-cursor: hand;
+}
+
+.verPedido-button{
+    -fx-background-color: #2a5605;
+    -fx-background-radius: 30;
+    -fx-cursor: hand;
+}
+
+.volver-button{
+    -fx-background-color: #ff0000;
+    -fx-background-radius: 30;
+    -fx-cursor: hand;
+}
+
+.actualizar-button{
+    -fx-background-color: #00a3f3;
+    -fx-background-radius: 30;
+    -fx-cursor: hand;
+}

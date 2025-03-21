@@ -9,7 +9,6 @@ import java.util.List;
 @Getter
 @Setter
 public class GestionContactos {
-
     private List<Contacto> contactos;
 
     public GestionContactos() {
@@ -17,6 +16,6 @@ public class GestionContactos {
     }
 
     public Contacto crearContacto (String nombre, String apellido, String email, String telefono, String direccion, LocalDate fechaNacimiento) {
-
+        return null;
     }
 }
