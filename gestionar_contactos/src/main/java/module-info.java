@@ -1,6 +1,7 @@
 module co.edu.uniquindio.gestionar_contactos {
     requires javafx.controls;
     requires javafx.fxml;
+    requires static lombok;
 
 
     opens co.edu.uniquindio.gestionar_contactos to javafx.fxml;
