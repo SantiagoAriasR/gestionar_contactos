@@ -1,5 +1,6 @@
 package co.edu.uniquindio.gestionar_contactos.Models;
 
+import javafx.scene.image.Image;
 import lombok.*;
 
 import java.awt.*;
@@ -26,27 +27,32 @@ public class GestionContactos {
             throw new Exception("El nombre es obligatorio");
         }
 
-        if(direccion == null || direccion.isEmpty()){
+        if(telefono == null || telefono.isEmpty()){
             throw new Exception("La dirección es obligatoria");
         }
 
-        if(email == null || email.isEmpty()){
+        if(correo == null || correo.isEmpty()){
             throw new Exception("El email es obligatorio");
         }
 
-        if(password == null || password.isEmpty()){
+        if(diaCumpleanos == null){
             throw new Exception("La contraseña es obligatoria");
         }
 
-        if(buscarUsuario(id) != null){
+        if(buscarContacto(telefono) != null){
             throw new Exception("El usuario ya existe");
         }
 
-        Usuario usuario = new Usuario(id, nombre, direccion, email, password);
+        Contacto contacto = new Contacto(nombre, apellido, telefono, correo, diaCumpleanos, fotoPerfil);
         // Se agrega el usuario a la lista de usuarios
-        usuarios.add(usuario);
-        // Se registra la billetera del usuario
-        registrarBilletera(usuario);
+        listaContactos.add(contacto);
+    }
+
+    public Contacto buscarContacto(String telefono){
+        return listaContactos.stream()
+                .filter(contacto -> contacto.getTelefono().equals(telefono))
+                .findFirst()
+                .orElse(null);
     }
 
 }
