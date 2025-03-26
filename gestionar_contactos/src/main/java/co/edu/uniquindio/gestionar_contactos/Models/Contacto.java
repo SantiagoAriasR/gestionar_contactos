@@ -16,7 +16,7 @@ public class Contacto {
     private String apellido;
     private String telefono;
     private String correo;
-    private LocalDate diaCumpleaños;
+    private LocalDate diaCumpleanos;
     private Image fotoPerfil;
 }
 
