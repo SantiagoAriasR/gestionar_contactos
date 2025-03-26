@@ -1,6 +1,7 @@
 package co.edu.uniquindio.gestionar_contactos.App;
 
 import co.edu.uniquindio.gestionar_contactos.Controller.GestionarContactosController;
+import co.edu.uniquindio.gestionar_contactos.Models.GestionContactos;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -9,7 +10,14 @@ import javafx.stage.Stage;
 import java.io.IOException;
 
 public class App extends Application {
+    // Creamos nuestra empresa ya que se instancia una sola vez
+    public static GestionContactos gestionContactos = new GestionContactos();
     private Stage primaryStage;
+
+    public GestionContactos getGestionContactos() {
+        return gestionContactos;
+    }
+
 
     // Metodo start
         @Override

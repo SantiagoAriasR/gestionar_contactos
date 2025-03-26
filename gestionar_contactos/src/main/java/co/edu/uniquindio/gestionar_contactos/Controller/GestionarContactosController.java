@@ -4,6 +4,10 @@ import java.net.URL;
 import java.util.ResourceBundle;
 
 import co.edu.uniquindio.gestionar_contactos.App.App;
+import co.edu.uniquindio.gestionar_contactos.Models.Contacto;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -12,9 +16,16 @@ import javafx.scene.control.DatePicker;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 
 public class GestionarContactosController {
+
     App app;
+
+    // Crear la lista de la tabla
+    ObservableList<Contacto> listaContactos = FXCollections.observableArrayList();
+    Contacto selectedContacto;
 
     @FXML // ResourceBundle that was given to the FXMLLoader
     private ResourceBundle resources;
@@ -41,25 +52,28 @@ public class GestionarContactosController {
     private Button btnSeleccionarFotoPerfil; // Value injected by FXMLLoader
 
     @FXML // fx:id="choiseBoxSeleccionarTipoBusqueda"
-    private ChoiceBox<?> choiseBoxSeleccionarTipoBusqueda; // Value injected by FXMLLoader
+    private ChoiceBox<String> choiseBoxSeleccionarTipoBusqueda; // Value injected by FXMLLoader
 
     @FXML // fx:id="tbcApellido"
-    private TableColumn<?, ?> tbcApellido; // Value injected by FXMLLoader
+    private TableColumn<Contacto, String> tbcApellido; // Value injected by FXMLLoader
 
     @FXML // fx:id="tbcCumpleanos"
-    private TableColumn<?, ?> tbcCumpleanos; // Value injected by FXMLLoader
+    private TableColumn<Contacto, String> tbcCumpleanos; // Value injected by FXMLLoader
+
+    @FXML // fx:id="imageFotoPerfil"
+    private ImageView imageFotoPerfil; // Value injected by FXMLLoader
 
     @FXML // fx:id="tbcEmail"
-    private TableColumn<?, ?> tbcEmail; // Value injected by FXMLLoader
+    private TableColumn<Contacto, String> tbcEmail; // Value injected by FXMLLoader
 
     @FXML // fx:id="tbcNombre"
-    private TableColumn<?, ?> tbcNombre; // Value injected by FXMLLoader
+    private TableColumn<Contacto, String> tbcNombre; // Value injected by FXMLLoader
 
     @FXML // fx:id="tbcNumero"
-    private TableColumn<?, ?> tbcNumero; // Value injected by FXMLLoader
+    private TableColumn<Contacto, String> tbcNumero; // Value injected by FXMLLoader
 
     @FXML // fx:id="tblContactos"
-    private TableView<?> tblContactos; // Value injected by FXMLLoader
+    private TableView<Contacto> tblContactos; // Value injected by FXMLLoader
 
     @FXML // fx:id="txtApellido"
     private TextField txtApellido; // Value injected by FXMLLoader
@@ -78,27 +92,27 @@ public class GestionarContactosController {
 
     @FXML
     void onActualizarContactoAction(ActionEvent event) {
-
+        actualizarContacto();
     }
 
     @FXML
     void onAgregarContactoAction(ActionEvent event) {
-
+        agregarContacto();
     }
 
     @FXML
     void onEliminarContactoAction(ActionEvent event) {
-
+        eliminarContacto();
     }
 
     @FXML
     void onSeleccionarFotoAction(ActionEvent event) {
-
+        seleccionarFotoPerfil();
     }
 
     @FXML
     void onRealizarBusquedaAction(ActionEvent event) {
-        System.out.println("Olarte es gay");
+        realizarBusqueda();
     }
 
     @FXML // This method is called by the FXMLLoader when initialization is complete
@@ -121,7 +135,77 @@ public class GestionarContactosController {
         assert txtNombre != null : "fx:id=\"txtNombre\" was not injected: check your FXML file 'GestionarContactos.fxml'.";
         assert txtNumeroTelefono != null : "fx:id=\"txtNumeroTelefono\" was not injected: check your FXML file 'GestionarContactos.fxml'.";
         assert txtRealizarBusqueda != null : "fx:id=\"txtRealizarBusqueda\" was not injected: check your FXML file 'GestionarContactos.fxml'.";
+        assert imageFotoPerfil != null : "fx:id=\"imageFotoPerfil\" was not injected: check your FXML file 'GestionarContactos.fxml'.";
+        configurarChoiceBoxBusqueda();
+        initView();
+    }
 
+    private void initView() {
+        // Traer los datos a la tabla
+        initDataBinding();
+
+        // Obtiene la lista
+        obtenerContactos();
+
+        // Limpiar la tabla
+        tblContactos.getItems().clear();
+
+        // Agregar los elementos a la tabla
+        tblContactos.setItems(listaContactos);
+
+        // Seleccionar elemento de la tabla
+        listenerSelection();
+    }
+
+    // Configuración de la tabla (celdas,filas,tipo de datos...)
+    private void initDataBinding() {
+        tbcNombre
+                .setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getNombre().toString()));
+        tbcApellido
+                .setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getApellido().toString()));
+        tbcEmail
+                .setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getCorreo().toString()));
+        tbcNumero
+                .setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getTelefono().toString()));
+        tbcCumpleanos
+                .setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getDiaCumpleanos().toString()));
+    }
+
+    // Función para obtener los alquileres
+    private void obtenerContactos() {
+        listaContactos.addAll(app.getGestionContactos().getListaContactos());
+    }
+
+    // Función para seleccionar elementos de la tabla (Escuchado ó Listener)
+    public void listenerSelection() {
+        tblContactos.getSelectionModel().selectedItemProperty()
+                .addListener((obs, oldSelection, newSelection) -> {
+                    selectedContacto = newSelection;
+                    mostrarInformacionContacto(selectedContacto);
+                });
+        ;
+    }
+
+    // Función para mostrar información en los elementos una vez seleccionado uno de
+    // la tabla
+    private void mostrarInformacionContacto(Contacto contacto) {
+        if (contacto != null) {
+            txtNombre.setText(contacto.getNombre().toString());
+            txtApellido.setText(contacto.getApellido().toString());
+            txtEmail.setText(contacto.getCorreo());
+            txtNumeroTelefono.setText(contacto.getTelefono().toString());
+            DatePickerFechaCumpleaños.setValue(contacto.getDiaCumpleanos());
+        }
+    }
+
+    // Funcion agregar Contacto a la tabla
+    private void agregarContacto() {
+        Image imagen = imageFotoPerfil.getImage();
+        Contacto contacto = app.getGestionContactos().registrarContacto(txtNombre.getText(),txtApellido.getText(),txtNumeroTelefono.getText(),txtEmail.getText(),DatePickerFechaCumpleaños.getValue(),imagen);
+        if (empleadosController.crearEmpleado(empleado)) {
+            listaEmpleados.add(empleado);
+            limpiarCamposEmpleado();
+        }
     }
 
     // Función para el poder instancia sobre app
