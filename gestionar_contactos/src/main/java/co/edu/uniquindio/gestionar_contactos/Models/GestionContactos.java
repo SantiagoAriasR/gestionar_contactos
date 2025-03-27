@@ -11,43 +11,45 @@ import java.util.List;
 @Getter
 @Setter
 public class GestionContactos {
+    //Atributos
     private List<Contacto> listaContactos;
 
+    // Constructor
     public GestionContactos() {
         this.listaContactos = new LinkedList<>();
     }
 
-    public void registrarContacto(String nombre, String apellido, String telefono, String correo, LocalDate diaCumpleanos, Image fotoPerfil) throws Exception{
+    // Agregar contacto a la lista
+    public void registrarContacto(Contacto contacto) throws Exception{
 
-        if(nombre == null || nombre.isEmpty()){
+        if(contacto.getNombre() == null || contacto.getNombre().isEmpty()){
             throw new Exception("El id es obligatorio");
         }
 
-        if(apellido == null || apellido.isEmpty()){
+        if(contacto.getApellido() == null || contacto.getApellido().isEmpty()){
             throw new Exception("El nombre es obligatorio");
         }
 
-        if(telefono == null || telefono.isEmpty()){
+        if(contacto.getTelefono() == null || contacto.getTelefono().isEmpty()){
             throw new Exception("La dirección es obligatoria");
         }
 
-        if(correo == null || correo.isEmpty()){
+        if(contacto.getCorreo() == null || contacto.getCorreo().isEmpty()){
             throw new Exception("El email es obligatorio");
         }
 
-        if(diaCumpleanos == null){
+        if(contacto.getDiaCumpleanos() == null){
             throw new Exception("La contraseña es obligatoria");
         }
 
-        if(buscarContacto(telefono) != null){
+        if(buscarContacto(contacto.getTelefono()) != null){
             throw new Exception("El usuario ya existe");
         }
 
-        Contacto contacto = new Contacto(nombre, apellido, telefono, correo, diaCumpleanos, fotoPerfil);
-        // Se agrega el usuario a la lista de usuarios
         listaContactos.add(contacto);
     }
 
+    // Funcion para buscar si el contacto existe dependiendo el numero de telefono
     public Contacto buscarContacto(String telefono){
         return listaContactos.stream()
                 .filter(contacto -> contacto.getTelefono().equals(telefono))
@@ -55,4 +57,33 @@ public class GestionContactos {
                 .orElse(null);
     }
 
+    // Funcion para eliminar Contactos
+    public boolean eliminarContacto(String telefono){
+        boolean centinela = false;
+        for(Contacto contacto: listaContactos){
+            if(contacto.getTelefono().equals(telefono)){
+                listaContactos.remove(contacto);
+                centinela = true;
+                break;
+            }
+        }
+        return centinela;
+    }
+
+    public boolean actualizarContacto(String telefono, Contacto actualizado){
+        boolean centinela = false;
+        for(Contacto contacto : listaContactos){
+            if(contacto.getTelefono().equals(telefono)){
+                contacto.setNombre(actualizado.getNombre());
+                contacto.setApellido(actualizado.getApellido());
+                contacto.setCorreo(actualizado.getCorreo());
+                contacto.setTelefono(actualizado.getTelefono());
+                contacto.setDiaCumpleanos(actualizado.getDiaCumpleanos());
+                contacto.setFotoPerfil(actualizado.getFotoPerfil());
+                centinela = true;
+                break;
+            }
+        }
+        return centinela;
+    }
 }

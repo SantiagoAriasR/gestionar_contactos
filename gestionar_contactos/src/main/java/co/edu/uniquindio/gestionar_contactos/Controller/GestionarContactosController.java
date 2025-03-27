@@ -107,12 +107,18 @@ public class GestionarContactosController {
 
     @FXML
     void onSeleccionarFotoAction(ActionEvent event) {
-        seleccionarFotoPerfil();
+        //seleccionarFotoPerfil();
     }
 
     @FXML
     void onRealizarBusquedaAction(ActionEvent event) {
-        realizarBusqueda();
+        //realizarBusqueda();
+    }
+
+    // Función para el poder instancia sobre app
+    public void setApp(App app) {
+        this.app = app;
+        initView();
     }
 
     @FXML // This method is called by the FXMLLoader when initialization is complete
@@ -137,8 +143,14 @@ public class GestionarContactosController {
         assert txtRealizarBusqueda != null : "fx:id=\"txtRealizarBusqueda\" was not injected: check your FXML file 'GestionarContactos.fxml'.";
         assert imageFotoPerfil != null : "fx:id=\"imageFotoPerfil\" was not injected: check your FXML file 'GestionarContactos.fxml'.";
         configurarChoiceBoxBusqueda();
-        initView();
     }
+
+    // Metodo para agregar los datos quemados a nuestros ChoiceBox
+    public void configurarChoiceBoxBusqueda() {
+        // Obtener la lista de clientes (ahora LinkedList) de la empresa
+        choiseBoxSeleccionarTipoBusqueda.setItems(FXCollections.observableArrayList("Telefono", "Nombre"));
+    }
+
 
     private void initView() {
         // Traer los datos a la tabla
@@ -198,22 +210,68 @@ public class GestionarContactosController {
         }
     }
 
-    // Funcion agregar Contacto a la tabla
+    // Funcion agregar Empleado a la tabla
     private void agregarContacto() {
-        Image imagen = imageFotoPerfil.getImage();
-        Contacto contacto = app.getGestionContactos().registrarContacto(txtNombre.getText(),txtApellido.getText(),txtNumeroTelefono.getText(),txtEmail.getText(),DatePickerFechaCumpleaños.getValue(),imagen);
-        if (empleadosController.crearEmpleado(empleado)) {
-            listaEmpleados.add(empleado);
-            limpiarCamposEmpleado();
+        try {
+            Contacto contacto = buildContacto();
+            app.getGestionContactos().registrarContacto(contacto);
+            limpiarCamposContactos();
+            listaContactos.add(contacto);
+            System.out.println("Contacto agregado con éxito.");
+        } catch (Exception e) {
+            System.out.println("Error al agregar contacto: " + e.getMessage());
         }
     }
 
-    // Función para el poder instancia sobre app
-    public void setApp(App app) {
-        this.app = app;
+    // Función para construir un nuevo Contacto
+    private Contacto buildContacto() {
+        return Contacto.builder()
+                .nombre(txtNombre.getText())
+                .apellido(txtApellido.getText())
+                .telefono(txtNumeroTelefono.getText())
+                .correo(txtEmail.getText())
+                .diaCumpleanos(DatePickerFechaCumpleaños.getValue())
+                .fotoPerfil(imageFotoPerfil.getImage())
+                .build();
     }
 
+    // Funcion para elimiar contacto de la tabla
+    public void eliminarContacto() {
+        if (app.getGestionContactos().eliminarContacto(txtNumeroTelefono.getText())) {
+            listaContactos.remove(selectedContacto);
+            limpiarCamposContactos();
+            limpiarSeleccion();
+        }
+    }
 
+    // Funcion para actualizar Alquiler
+    private void actualizarContacto() {
+        if (selectedContacto != null &&
+                app.getGestionContactos().actualizarContacto(selectedContacto.getTelefono(), buildContacto())) {
 
+            int index = listaContactos.indexOf(selectedContacto);
+            if (index >= 0) {
+                listaContactos.set(index, buildContacto());
+            }
+
+            tblContactos.refresh();
+            limpiarSeleccion();
+            limpiarCamposContactos();
+        }
+    }
+
+    // Función para limpiar la selección
+    private void limpiarSeleccion() {
+        tblContactos.getSelectionModel().clearSelection();
+        limpiarCamposContactos();
+    }
+    // Función limpiar campos compra
+    private void limpiarCamposContactos() {
+        txtEmail.clear();
+        txtNumeroTelefono.clear();
+        txtApellido.clear();
+        txtNombre.clear();
+        DatePickerFechaCumpleaños.setValue(null);
+    }
 }
 
