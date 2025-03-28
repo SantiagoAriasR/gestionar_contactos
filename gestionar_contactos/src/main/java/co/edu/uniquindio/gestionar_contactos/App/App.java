@@ -11,7 +11,7 @@ import java.io.IOException;
 
 public class App extends Application {
     // Creamos nuestra empresa ya que se instancia una sola vez
-    public static GestionContactos gestionContactos = new GestionContactos();
+    GestionContactos gestionContactos = GestionContactos.getInstancia();
     private Stage primaryStage;
 
     public GestionContactos getGestionContactos() {

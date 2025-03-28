@@ -194,13 +194,20 @@ public class GestionarContactosController {
 
     // Función para seleccionar elementos de la tabla (Escuchado ó Listener)
     public void listenerSelection() {
-        tblContactos.getSelectionModel().selectedItemProperty()
-                .addListener((obs, oldSelection, newSelection) -> {
-                    selectedContacto = newSelection;
-                    mostrarInformacionContacto(selectedContacto);
-                });
+
+        tblContactos.setOnMouseClicked(e -> {
+            //Obtener la nota seleccionada
+            Contacto selected = tblContactos.getSelectionModel().getSelectedItem();
+
+            if(selected != null){
+                selectedContacto = selected;
+                mostrarInformacionContacto(selectedContacto);
+            }
+
+        });
         ;
     }
+
 
     // Función para mostrar información en los elementos una vez seleccionado uno de
     // la tabla
@@ -220,9 +227,9 @@ public class GestionarContactosController {
         try {
             Contacto contacto = buildContacto();
             app.getGestionContactos().registrarContacto(contacto);
-            limpiarCamposContactos();
             listaContactos.add(contacto);
             System.out.println("Contacto agregado con éxito.");
+            limpiarCamposContactos();
         } catch (Exception e) {
             System.out.println("Error al agregar contacto: " + e.getMessage());
         }
@@ -254,15 +261,14 @@ public class GestionarContactosController {
         if (selectedContacto != null &&
                 app.getGestionContactos().actualizarContacto(selectedContacto.getTelefono(), buildContacto())) {
 
-            int index = listaContactos.indexOf(selectedContacto);
-            if (index >= 0) {
-                listaContactos.set(index, buildContacto());
-            }
-
-            tblContactos.refresh();
             limpiarSeleccion();
             limpiarCamposContactos();
+            actualizarTabla();
         }
+    }
+
+    private void actualizarTabla() {
+        listaContactos.setAll(app.getGestionContactos().getListaContactos());
     }
 
     // Función para limpiar la selección

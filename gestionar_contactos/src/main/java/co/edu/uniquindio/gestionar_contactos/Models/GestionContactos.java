@@ -1,5 +1,6 @@
 package co.edu.uniquindio.gestionar_contactos.Models;
 
+import co.edu.uniquindio.gestionar_contactos.App.App;
 import javafx.scene.control.Alert;
 import javafx.scene.image.Image;
 import lombok.*;
@@ -15,8 +16,10 @@ public class GestionContactos {
     //Atributos
     private List<Contacto> listaContactos;
 
+    private static GestionContactos instance = new GestionContactos();
+
     // Constructor
-    public GestionContactos() {
+    private GestionContactos() {
         this.listaContactos = new LinkedList<>();
     }
 
@@ -105,5 +108,12 @@ public class GestionContactos {
         alert.setHeaderText("No puedes dejar espacios vacios");
         alert.setContentText(e.getMessage());
         alert.showAndWait();
+    }
+
+    public static GestionContactos getInstancia(){
+        if (instance == null) {
+            instance = new GestionContactos();
+        }
+        return instance;
     }
 }
