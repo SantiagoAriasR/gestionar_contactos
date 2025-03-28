@@ -1,7 +1,10 @@
 package co.edu.uniquindio.gestionar_contactos.Controller;
 
+import java.io.File;
 import java.net.URL;
+import java.util.List;
 import java.util.ResourceBundle;
+import java.util.stream.Collectors;
 
 import co.edu.uniquindio.gestionar_contactos.App.App;
 import co.edu.uniquindio.gestionar_contactos.Models.Contacto;
@@ -18,6 +21,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.stage.FileChooser;
 
 public class GestionarContactosController {
 
@@ -107,12 +111,12 @@ public class GestionarContactosController {
 
     @FXML
     void onSeleccionarFotoAction(ActionEvent event) {
-        //seleccionarFotoPerfil();
+        seleccionarFotoPerfil();
     }
 
     @FXML
     void onRealizarBusquedaAction(ActionEvent event) {
-        //realizarBusqueda();
+        realizarBusqueda();
     }
 
     // Función para el poder instancia sobre app
@@ -207,6 +211,7 @@ public class GestionarContactosController {
             txtEmail.setText(contacto.getCorreo());
             txtNumeroTelefono.setText(contacto.getTelefono().toString());
             DatePickerFechaCumpleaños.setValue(contacto.getDiaCumpleanos());
+            imageFotoPerfil.setImage(contacto.getFotoPerfil());
         }
     }
 
@@ -272,6 +277,57 @@ public class GestionarContactosController {
         txtApellido.clear();
         txtNombre.clear();
         DatePickerFechaCumpleaños.setValue(null);
+        imageFotoPerfil.setImage(null);
     }
+
+    // Funcion para filtrar tabla
+    public void realizarBusqueda() {
+        String criterio = choiseBoxSeleccionarTipoBusqueda.getValue(); // "Telefono" o "Nombre"
+        // Verificamos que haya texto para filtrar
+        if (txtRealizarBusqueda.getText().isEmpty()) {
+            listaContactos.clear();
+            obtenerContactos();
+            tblContactos.setItems(listaContactos); // Restaurar la lista original
+            return;
+        }
+
+        // Filtramos la lista sin modificar la original
+        List<Contacto> contactosFiltrados = listaContactos.stream()
+                .filter(contacto -> {
+                    if ("Telefono".equals(criterio)) {
+                        return contacto.getTelefono().toLowerCase().equals(txtRealizarBusqueda.getText().toLowerCase()) || (contacto.getTelefono().toLowerCase().contains(txtRealizarBusqueda.getText().toLowerCase()));
+                    } else if ("Nombre".equals(criterio)) {
+                        return contacto.getNombre().toLowerCase().contains(txtRealizarBusqueda.getText().toLowerCase());
+                    }
+                    return false;
+                })
+                .collect(Collectors.toList());
+
+        // Convertimos la lista filtrada a ObservableList y la asignamos a la tabla
+        ObservableList<Contacto> listaFiltrada = FXCollections.observableArrayList(contactosFiltrados);
+        listaContactos.setAll(listaFiltrada);
+        txtRealizarBusqueda.setText("");
+        choiseBoxSeleccionarTipoBusqueda.setValue(null);
+    }
+
+    // Funcion para seleccionar foto de perfil del contacto
+    public void seleccionarFotoPerfil() {
+        FileChooser fileChooser = new FileChooser();
+
+        // Filtro para permitir solo imágenes
+        fileChooser.getExtensionFilters().add(
+                new FileChooser.ExtensionFilter("Archivos de Imagen", "*.png", "*.jpg", "*.jpeg")
+        );
+
+        // Mostrar el diálogo de selección de archivos
+        File archivoSeleccionado = fileChooser.showOpenDialog(null);
+
+        if (archivoSeleccionado != null) {
+            // Convertir el archivo a una imagen y mostrarlo en el ImageView
+            Image imagen = new Image(archivoSeleccionado.toURI().toString());
+            imageFotoPerfil.setImage(imagen);
+        }
+    }
+
 }
 
