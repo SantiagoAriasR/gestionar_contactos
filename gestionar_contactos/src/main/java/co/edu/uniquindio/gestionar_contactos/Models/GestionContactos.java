@@ -35,14 +35,14 @@ public class GestionContactos {
             throw apellidoVacio;
         }
 
-        if(contacto.getTelefono() == null || contacto.getTelefono().isEmpty() || contacto.getTelefono().length() < 10){
-            Exception telefonoVacio = new Exception("El telefono es obligatorio");
+        if(contacto.getTelefono() == null || contacto.getTelefono().isEmpty() || contacto.getTelefono().length() < 10 || !contacto.getTelefono().chars().allMatch(Character::isDigit)){
+            Exception telefonoVacio = new Exception("El telefono es obligatorio y solo debe contener digitos");
             manejarExcepciones(telefonoVacio);
             throw telefonoVacio;
         }
 
-        if(contacto.getCorreo() == null || contacto.getCorreo().isEmpty()){
-            Exception correoVacio = new Exception("El email es obligatorio");
+        if(contacto.getCorreo() == null || contacto.getCorreo().isEmpty() || !contacto.getCorreo().contains("@")){
+            Exception correoVacio = new Exception("El email es obligatorio y contener '@'");
             manejarExcepciones(correoVacio);
             throw correoVacio;
         }
@@ -52,6 +52,7 @@ public class GestionContactos {
             manejarExcepciones(cumpleanosVacio);
             throw cumpleanosVacio;
         }
+
 
         if(buscarContacto(contacto.getTelefono()) != null){
             throw new Exception("El usuario ya existe");
